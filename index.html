@@ -1,0 +1,55 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <div>
+            <form>
+                <input type="text" name="user" placeholder="user" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+                <label>
+                    Apply Fix
+                    <input type="checkbox" name="fix" />
+                </label>
+                <input type="submit" value="Get Tweets"/>
+            </form>
+        </div>
+
+        <div id="tweet-timeline-container"></div>
+
+        <script type="text/javascript">
+          var urlParams = new URLSearchParams(window.location.search);
+          var user = urlParams.get("user") || "CloudNativeFdn";
+
+          document.querySelector("input[name='user']").setAttribute("value", user);
+          if (urlParams.get("fix")) {
+            document.querySelector("input[name='fix']").setAttribute("checked",  "checked");
+          }
+
+          var accountLink = document.createElement("a");
+          accountLink.setAttribute("href", "https://twitter.com/" + user);
+          accountLink.setAttribute("class", "twitter-timeline");
+          accountLink.innerText = "Tweets by @" + user;
+          document.getElementById("tweet-timeline-container").appendChild(accountLink);
+        </script>
+
+        <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+        <script type="text/javascript">
+          (function () {
+            document.getElementById("tweet-timeline-container").addEventListener("DOMSubtreeModified", function (el) {
+              if (urlParams.get("fix") && el.target.tagName === "IFRAME") {
+                var head = el.target.contentDocument.head;
+                var newStyle = el.target.contentDocument.createElement("style");
+                const css = [
+                  ".TweetAuthor { max-width: 300px; text-overflow: ellipsis; }",
+                  ".timeline-Tweet-text a:not(.customisable) { word-break: break-all; }"
+                ];
+                newStyle.innerHTML = css.join(" ");
+                head.appendChild(newStyle);
+              }
+            })
+          })();
+        </script>
+    </body>
+</html>
+
